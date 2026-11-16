@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مسابقة مناهج</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@500;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d2b2e; --teal:#0f5c5f; --teal2:#14797c; --mint:#e6f2ef; --paper:#f7f5ef;
+  --gold:#c8962e; --gold2:#f0c565; --line:#d9dfdc; --muted:#5d6f70;
+  --a:#1d5fbf; --aBg:#e7effc; --b:#d4651a; --bBg:#fdeee3; --ok:#1f8a4c; --bad:#b83a3a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Tajawal",system-ui,sans-serif;color:var(--ink);background:var(--paper);
+  background-image:radial-gradient(circle at 15% 10%,rgba(20,121,124,.08),transparent 40%),radial-gradient(circle at 90% 90%,rgba(200,150,46,.10),transparent 45%);
+  min-height:100vh;display:flex;flex-direction:column}
+button{font-family:inherit;cursor:pointer}
+h1,h2,h3,.disp{font-family:"Changa",sans-serif}
+header.top{display:grid;grid-template-columns:170px 1fr 170px;align-items:center;gap:16px;padding:12px 28px;background:var(--teal);color:#fff;
+  border-bottom:4px solid var(--gold)}
+header.top .logo{height:112px;width:auto;max-width:170px;object-fit:contain;background:#fff;border-radius:14px;padding:8px 12px;display:none;justify-self:start;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+header.top .logo.show{display:block}
+header.top .t{flex:1;text-align:center}
+header.top .t h1{margin:0;font-size:28px;letter-spacing:.5px}
+header.top .t small{opacity:.85;font-size:15px}
+.tools{position:fixed;bottom:14px;left:14px;display:flex;gap:8px;z-index:40}
+.tools button{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px;color:var(--teal);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+.crumbs{display:flex;gap:8px;align-items:center;color:var(--muted);margin-bottom:18px;font-size:16px;flex-wrap:wrap}
+.crumbs a{color:var(--teal2);cursor:pointer;text-decoration:none;font-weight:700}
+.sec-title{font-size:30px;margin:0 0 6px}
+.sec-sub{color:var(--muted);margin:0 0 26px;font-size:17px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 22px;text-align:center;
+  transition:transform .15s,box-shadow .15s,border-color .15s;cursor:pointer;overflow:hidden}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,92,95,.14);border-color:var(--teal2)}
+.card .big{font-family:"Changa";font-size:64px;line-height:1;color:var(--teal);font-weight:800}
+.card .nm{font-family:"Changa";font-size:24px;margin-top:10px;font-weight:700}
+.card .meta{color:var(--muted);margin-top:8px;font-size:15px}
+.card .band{position:absolute;inset:0 0 auto 0;height:6px;background:var(--gold)}
+.card .ic{font-size:52px;line-height:1}
+.pill{display:inline-block;background:var(--mint);color:var(--teal);border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700}
+.pill.empty{background:#f3e9e9;color:var(--bad)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px}
+.row{display:flex;gap:18px;flex-wrap:wrap}
+.row>*{flex:1;min-width:260px}
+label.f{display:block;font-weight:700;margin:0 0 6px;font-size:15px}
+input.t,textarea.t,select.t{width:100%;font-family:inherit;font-size:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+input.t:focus,textarea.t:focus,select.t:focus{outline:none;border-color:var(--teal2)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:16px;font-weight:700;color:var(--ink)}
+.chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn{border:none;border-radius:14px;padding:14px 26px;font-size:19px;font-weight:800;background:var(--teal);color:#fff}
+.btn:hover{background:var(--teal2)}
+.btn.gold{background:var(--gold);color:#1d1606}
+.btn.ghost{background:#fff;color:var(--teal);border:1.5px solid var(--line)}
+.btn.sm{padding:8px 14px;font-size:15px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+/* game */
+.board{display:grid;gap:14px;margin-bottom:18px}
+.score{--c:#1d5fbf;--bg:#e7effc;background:var(--bg);border:3px solid var(--c);border-radius:20px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:transform .2s;min-width:0}
+.score .n{font-family:"Changa";font-size:24px;font-weight:700;color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score .p{font-family:"Changa";font-size:54px;font-weight:800;line-height:1;color:var(--c);min-width:60px;text-align:center}
+.score .rt{display:flex;align-items:center;gap:6px}
+.score .adj{display:flex;flex-direction:column;gap:4px}
+.score .adj button{border:none;background:rgba(255,255,255,.85);border-radius:8px;width:28px;height:24px;font-size:16px;font-weight:800;color:var(--muted)}
+.board.many .score{flex-direction:column;justify-content:center;text-align:center;padding:10px 8px}
+.board.many .score .n{font-size:19px;max-width:100%}
+.board.many .score .p{font-size:46px}
+.board.many .score .adj{flex-direction:row}
+.score.lead{transform:scale(1.03);box-shadow:0 8px 22px rgba(0,0,0,.08)}
+.score.pop .p{animation:pop .6s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.5)}100%{transform:scale(1)}}
+.qcard{background:#fff;border-radius:26px;border:1px solid var(--line);padding:34px 40px 30px;text-align:center;box-shadow:0 10px 40px rgba(13,43,46,.07);position:relative}
+.qcard .tag{position:absolute;top:16px;right:20px}
+.qnum{position:absolute;top:14px;left:18px;background:var(--teal);color:#fff;border-radius:12px;padding:6px 14px;font-size:14px}
+.qnum b{font-family:"Changa";font-size:20px;margin:0 4px}
+.qtext{font-family:"Changa";font-size:clamp(28px,3.6vw,48px);transition:font-size .2s;font-weight:700;line-height:1.55;margin:26px 0 10px}
+.qcard.drawing .ans,.qcard.drawing .award,.qcard.drawing #revealWrap,.qcard.drawing .timer,.qcard.drawing .tnum,.qcard.drawing .tag{visibility:hidden}
+.dice{display:inline-block;font-size:64px;animation:spin .5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.roll{font-family:"Changa";font-size:90px;font-weight:800;color:var(--teal);line-height:1.1}
+.roll.hit{color:var(--gold);animation:pop .6s}
+.qcard.sz-s .qtext{font-size:clamp(22px,2.6vw,34px)}
+.qcard.sz-l .qtext{font-size:clamp(38px,5vw,70px);line-height:1.45}
+.qcard.sz-s .ans{font-size:clamp(18px,2vw,26px)}
+.qcard.sz-l .ans{font-size:clamp(28px,3.4vw,46px)}
+.szbox{position:absolute;bottom:14px;left:18px;display:flex;gap:4px}
+.szbox button{border:1.5px solid var(--line);background:#fff;border-radius:8px;min-width:34px;height:30px;font-weight:800;color:var(--muted);font-family:"Changa"}
+.szbox button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.timer{width:100%;height:10px;background:#eef1ef;border-radius:999px;overflow:hidden;margin:20px 0 4px}
+.timer i{display:block;height:100%;background:var(--teal2);width:100%;transition:width 1s linear}
+.timer.warn i{background:var(--bad)}
+.tnum{font-family:"Changa";font-size:22px;color:var(--muted)}
+.ans{margin-top:22px;border-radius:18px;background:var(--mint);border:2px dashed var(--teal2);padding:20px;font-size:clamp(22px,2.6vw,34px);font-weight:800;color:var(--teal);display:none}
+.ans.show{display:block;animation:fade .35s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.award{display:grid;gap:12px;margin-top:22px}
+.award button{border:none;border-radius:16px;padding:16px 10px;font-size:21px;font-weight:800;color:#fff;background:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.award button:disabled{opacity:.4;cursor:default}
+.hint{color:var(--muted);font-size:14px;text-align:center;margin-top:14px}
+.final{text-align:center}
+.final .crown{font-size:84px}
+.final h2{font-size:44px;margin:6px 0}
+.final .fs{display:flex;gap:16px;justify-content:center;margin:26px 0;flex-wrap:wrap}
+.final .fs div{border-radius:20px;padding:16px 30px;font-family:"Changa";background:var(--bg);color:var(--c);border:3px solid transparent;min-width:150px}
+.final .fs div.win{border-color:var(--gold)}
+.final .fs b{display:block;font-size:58px;line-height:1.1}
+.final .fs i{font-style:normal;font-size:30px;display:block}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:12px}
+.team-in{border-radius:16px;padding:14px;border:2px solid var(--c);background:var(--bg)}
+.team-in label{color:var(--c)}
+/* admin */
+.qlist{margin-top:14px;display:flex;flex-direction:column;gap:8px;max-height:460px;overflow:auto}
+.qi{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#fff}
+.qi .x{flex:1}
+.qi .x b{display:block}
+.qi .x span{color:var(--teal2)}
+.qi button.ed{background:var(--mint);color:var(--teal)}
+.qi.edit{background:#fbfcfb;border-color:var(--teal2)}
+.qi .pill{align-self:center}
+.qi .btn{border:none}
+.qi .btn.sm{background:var(--teal);color:#fff;padding:8px 16px}
+.qi .btn.ghost.sm{background:#fff;color:var(--teal);border:1.5px solid var(--line)}
+.qi button{border:none;background:#f6e6e6;color:var(--bad);border-radius:8px;padding:6px 10px;font-weight:700}
+.drop{border:2px dashed var(--teal2);border-radius:16px;padding:30px;text-align:center;background:var(--mint);cursor:pointer}
+.drop.over{background:#d3ebe5}
+.qi.imp input.t{font-size:16px;padding:8px 10px}
+.note{background:#fff8e6;border:1px solid #f0d99a;border-radius:12px;padding:10px 14px;color:#6b5414;font-size:15px;margin-bottom:16px}
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;z-index:60;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(13,43,46,.5);display:none;align-items:center;justify-content:center;z-index:70}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:18px;padding:26px;max-width:420px;text-align:center}
+@media (max-width:760px){
+  .board,.award{grid-template-columns:1fr 1fr!important}
+  .qcard{padding:26px 18px}
+  header.top{padding:10px 14px;grid-template-columns:92px 1fr 0}header.top .logo{height:64px;padding:4px 6px}header.top .t h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="logo" id="logoMoe" alt="شعار وزارة التعليم">
+  <div class="t"><h1>مسابقة «مناهج»</h1><small>مدرسة سعد بن أبي وقاص الابتدائية</small></div>
+  <div></div>
+</header>
+<main id="app"></main>
+<div class="tools">
+  <button id="fsBtn">⛶ ملء الشاشة</button>
+  <button id="homeBtn">⌂ الرئيسية</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="box"><div id="modalMsg" style="font-size:19px;font-weight:700;margin-bottom:18px"></div>
+  <div class="actions" style="margin-top:0"><button class="btn sm" id="mYes">نعم</button><button class="btn ghost sm" id="mNo">إلغاء</button></div></div></div>
+<canvas id="confetti"></canvas>
+
+<script>
+const LOGOS = {moe:"data:image/png;base64,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"};
+const BUILTIN = {"g6-sci": {"1": [["ما الجزء الذي ينظم أنشطة الخلية؟", "النواة."], ["ما وظيفة السيتوبلازم في الخلية؟", "وسط هلامي توجد فيه عضيات الخلية وتحدث فيه تفاعلات."], ["أي تركيب يوجد في الخلية النباتية ويقوم بالبناء الضوئي؟", "البلاستيدات الخضراء."], ["ما وظيفة الجدار الخلوي؟", "الدعم والحماية وإعطاء الخلية النباتية شكلًا ثابتًا."], ["ما الجهاز الذي ينقل الأكسجين والمغذيات في الجسم؟", "الجهاز الدوري."], ["ما الجهاز المسؤول عن تبادل الغازات في الإنسان؟", "الجهاز التنفسي."], ["ما اسم تحول اليرقة إلى حشرة بالغة عبر مراحل؟", "التحول."], ["ما أول مرحلة في دورة حياة نبات بذري؟", "البذرة."], ["إلى أي مجموعتين يمكن تصنيف النباتات بحسب الأزهار؟", "نباتات زهرية ونباتات غير زهرية."], ["كيف نميز النباتات الزهرية عادة؟", "تنتج أزهارًا."], ["ماذا تسمى أفراد النوع الواحد في موطن واحد؟", "جماعة حيوية."], ["ما الموطن البيئي؟", "المكان الذي يعيش فيه المخلوق ويلبي حاجاته."], ["اذكر مكونًا غير حيوي في النظام البيئي.", "الماء أو الضوء أو التربة أو الهواء."], ["هل ضوء الشمس عنصر حيوي أم غير حيوي؟", "غير حيوي."], ["من المنتج في سلسلة عشب ← أرنب ← ثعلب؟", "العشب."], ["ما دور المنتج في السلسلة الغذائية؟", "يصنع غذاءه غالبًا بالبناء الضوئي."], ["ما نوع التكيف في الفراء السميك للحيوان القطبي؟", "تكيف تركيبي."], ["ما المقصود بالتكيف السلوكي؟", "سلوك يساعد المخلوق على البقاء."], ["اذكر نشاطًا بشريًا يضر المواطن الطبيعية.", "التلوث أو قطع الأشجار أو الرعي الجائر."], ["ما مثال أثر إيجابي للإنسان في البيئة؟", "إعادة التشجير أو إنشاء المحميات."], ["هل لون العين صفة وراثية أم مكتسبة؟", "وراثية."], ["ما معنى الصفة السائدة؟", "صفة قد تظهر عند وجود أليل سائد واحد."], ["ما حالة المادة ذات حجم ثابت وشكل متغير؟", "الحالة السائلة."], ["ما وحدة قياس الكتلة الشائعة في النظام الدولي؟", "الكيلوغرام."], ["ما اسم المادة المذابة في المحلول؟", "المذاب."], ["ما الفرق الأساسي بين المخلوط والمركب؟", "المخلوط امتزاج فيزيائي، والمركب اتحاد كيميائي."], ["اذكر دليلًا قد يشير إلى تفاعل كيميائي.", "تصاعد غاز أو تغير لون أو تكون راسب."], ["ما قانون حفظ الكتلة؟", "كتلة المتفاعلات تساوي كتلة النواتج في نظام مغلق."], ["هل محلول رقمه الهيدروجيني 3 حمضي أم قاعدي؟", "حمضي."], ["ما الرقم الهيدروجيني التقريبي للمحلول المتعادل؟", "7."], ["ما القوة التي تقاوم انزلاق سطحين متلامسين؟", "الاحتكاك."], ["ما المقصود بالقوى المتزنة؟", "قوى محصلتها صفر."], ["ما العلاقة الحسابية للسرعة المتوسطة؟", "المسافة ÷ الزمن."], ["ما وحدة قياس السرعة الشائعة؟", "متر لكل ثانية."], ["ما القوة التي تجذب الأجسام نحو الأرض؟", "الجاذبية."], ["ما الطاقة التي يمتلكها جسم بسبب حركته؟", "طاقة حركية."], ["ما مبدأ حفظ الطاقة؟", "الطاقة لا تفنى ولا تُستحدث من عدم بل تتحول."], ["أي الموجتين يمكن أن تنتقل في الفراغ: الصوت أم الضوء؟", "الضوء."], ["ما اسم ارتداد الضوء عن السطح؟", "الانعكاس."], ["ماذا يحدث بين شحنتين كهربائيتين متماثلتين؟", "تتنافران."], ["ماذا يحدث عند تقريب قطبين شماليين لمغناطيسين؟", "يتنافران."], ["ما اسم طور القمر عندما يبدو قرصه مضيئًا كاملًا؟", "البدر."], ["ما سبب تعاقب الليل والنهار؟", "دوران الأرض حول محورها."], ["ما السبب الرئيس لظاهرتي المد والجزر؟", "جاذبية القمر، مع إسهام الشمس."], ["في أي مجرة تقع مجموعتنا الشمسية؟", "درب التبانة."], ["ما الطبقة التي تحدث فيها معظم ظواهر الطقس؟", "التروبوسفير."], ["ما اسم الطبقة الصلبة الخارجية للأرض؟", "الغلاف الصخري."], ["ما اسم تفتت الصخور في مكانها؟", "التجوية."], ["مم تتكون الصخور عادة؟", "من معدن واحد أو عدة معادن."], ["ما الجهاز المستخدم لرصد الاهتزازات الزلزالية؟", "جهاز قياس الزلازل (السيزموجراف)."]], "2": [["أي تركيب يضبط دخول المواد إلى الخلية وخروجها؟", "الغشاء الخلوي."], ["وجد طالب خلية بلا جدار خلوي؛ هل يكفي ذلك وحده للجزم أنها حيوانية؟", "لا، يلزم فحص خصائص أخرى."], ["إذا شاهدت جدارًا خلويًا وبلاستيدات، فإلى أي نوع تنتمي الخلية؟", "خلية نباتية."], ["لماذا تبدو الخلية النباتية أكثر ثباتًا في الشكل؟", "لوجود الجدار الخلوي."], ["ما وظيفة الجذور عند نمو النبات؟", "امتصاص الماء والأملاح وتثبيت النبات."], ["أي جزء من النبات ينقل الماء والأملاح إلى الأوراق؟", "الساق عبر الأوعية الناقلة."], ["رتب دورة الفراشة: فراشة، يرقة، بيضة، عذراء.", "بيضة، يرقة، عذراء، فراشة."], ["كيف تختلف دورة حياة فراشة عن دجاجة؟", "تمر الفراشة بتحول كامل، أما الدجاجة فلا تمر بطور يرقة وعذراء."], ["هل يصنف نبات الصنوبر ضمن النباتات الزهرية؟", "لا، نبات غير زهري."], ["نبات لا ينتج أزهارًا وينتج مخاريط؛ كيف نصنفه؟", "نبات غير زهري."], ["في بركة أسماك وضفادع وطحالب، ما الذي تمثله كلها معًا؟", "مجتمع حيوي."], ["هل جميع أفراد نوع واحد في الغابة جماعة أم مجتمعًا؟", "جماعة حيوية."], ["كيف يؤثر نقص الماء في النباتات الصحراوية؟", "يحد من النمو وقد يؤدي إلى موت بعضها."], ["اذكر أثر إزالة الأشجار في موطن طيور.", "فقدان مواقع التعشيش والغذاء والظل."], ["ما دور الفطريات التي تحلل بقايا المخلوقات؟", "محللات تعيد المواد إلى البيئة."], ["صنف الجرادة في سلسلة عشب ← جرادة ← ضفدع.", "مستهلك أولي."], ["كيف يساعد نشاط الحيوان ليلًا في الصحراء على بقائه؟", "يتجنب حرارة النهار ويقل فقد الماء."], ["هل هجرة الطيور تكيف تركيبي أم سلوكي؟", "سلوكي."], ["كيف نقلل مخلفات البلاستيك في بيئة بحرية؟", "تقليل استخدامه وجمعه وإعادة تدويره."], ["كيف يحمي إنشاء محمية طبيعية التنوع الحيوي؟", "يحد من الصيد والتدمير ويحفظ المواطن."], ["تغيرت قوة عضلات طالب بالتمرين؛ أهذه صفة مكتسبة أم وراثية؟", "مكتسبة بتأثير البيئة والتدريب."], ["هل تعلم السباحة صفة مكتسبة أم موروثة؟", "مكتسبة."], ["ماذا يحدث لحركة جسيمات الماء عند تسخينه؟", "تزداد حركتها."], ["ما الحالة التي تشغل شكل الوعاء وحجمه كله؟", "الغازية."], ["كيف نفصل برادة الحديد عن الرمل؟", "باستخدام المغناطيس."], ["كيف نفصل الرمل عن الماء؟", "بالترشيح أو الترسيب ثم السكب."], ["إذا كانت كتلة المتفاعلات 20 غ في نظام مغلق، فكم كتلة النواتج؟", "20 غ."], ["ما دليل حدوث تفاعل عند وضع الخل مع بيكربونات الصوديوم؟", "تصاعد فقاعات الغاز."], ["ما نوع محلول رقمه الهيدروجيني 7؟", "متعادل."], ["هل الصابون المعتاد حمضي أم قاعدي غالبًا؟", "قاعدي غالبًا."], ["كتاب ساكن على الطاولة: هل القوى عليه متزنة؟", "نعم، محصلة القوى صفر."], ["طفل دفع بابًا مغلقًا ولم يتحرك؛ هل تحرك الباب بقوة الدفع؟", "لا، لم تتغير حركته."], ["قطع جسم 60 مترًا في 10 ثوانٍ؛ فما سرعته؟", "6 أمتار/ثانية."], ["قطع دراج 120 مترًا في 20 ثانية؛ ما سرعته المتوسطة؟", "6 أمتار/ثانية."], ["ما الذي يحدث لقوة الاحتكاك عادة عند زيادة خشونة السطح؟", "تزداد."], ["كرة موضوعة أعلى منحدر: ما نوع طاقتها المرتبطة بالارتفاع؟", "طاقة وضع."], ["ما تحول الطاقة الرئيس في المصباح الكهربائي؟", "كهربائية إلى ضوئية وحرارية."], ["هل ينتقل الصوت من خلال مادة صلبة؟", "نعم، ينتقل عبر المواد الصلبة."], ["لماذا تبدو الملعقة منكسرة داخل كوب ماء؟", "بسبب انكسار الضوء عند انتقاله بين وسطين."], ["في أي توصيل تستمر المصابيح الأخرى عند تعطل أحد المصابيح غالبًا؟", "التوصيل على التوازي."], ["كيف نصنع مغناطيسًا كهربائيًا بسيطًا؟", "بلف سلك حول قلب حديدي وتمرير تيار فيه."], ["لماذا نرى جزءًا مختلفًا من القمر خلال الشهر؟", "لتغير موضع القمر بالنسبة للأرض والشمس."], ["ما السبب الرئيس لتعاقب الفصول؟", "ميل محور الأرض مع دورانها حول الشمس."], ["ما القوة التي تُبقي الكواكب في مداراتها حول الشمس؟", "الجاذبية."], ["رتب من الأصغر إلى الأكبر: الكون، المجموعة الشمسية، المجرة.", "المجموعة الشمسية، المجرة، الكون."], ["هل وصف درجة حرارة اليوم يمثل طقسًا أم مناخًا؟", "طقسًا."], ["ما الظاهرة الجيولوجية التي قد تتكون عند تقارب الصفائح؟", "الجبال أو الزلازل أو البراكين بحسب نوع الحد."], ["نقلت مياه السيول فتات الصخور إلى الوادي؛ ما العملية؟", "التعرية والنقل."], ["صخر تكوّن من تبريد الصهارة؛ ما نوعه؟", "ناري."], ["ما التصرف الآمن أثناء زلزال داخل مبنى؟", "الاحتماء تحت طاولة ثابتة والابتعاد عن الزجاج."]], "3": [["خلية فقدت القدرة على تنظيم أنشطتها؛ أي جزء يرجح تضرره؟", "النواة."], ["خلية لا تستطيع ضبط تبادل الماء والأملاح؛ ما التركيب الأقرب للمشكلة؟", "الغشاء الخلوي."], ["نبات نُقل إلى مكان مظلم مدة طويلة؛ أي عملية تتأثر مباشرة؟", "البناء الضوئي لقلة الضوء."], ["نبات أخضر فقد قدرة بلاستيداته على العمل؛ ما أثر ذلك؟", "تقل قدرته على صنع الغذاء."], ["انخفض وصول الأكسجين إلى الخلايا مع سلامة الرئتين؛ أي جهاز يُفحص أولًا؟", "الجهاز الدوري لأنه ينقل الأكسجين."], ["أوراق نبات ذبلت مع سلامة الجذور؛ أي وظيفة في الساق قد تكون تعطلت؟", "نقل الماء إلى الأوراق."], ["أي تغير يميز دورة حياة الضفدع عن معظم الثدييات؟", "وجود طور شرغوف مائي قبل البلوغ."], ["توقفت يرقة عن التغذي وتكونت حولها عذراء؛ ما المرحلة التالية المتوقعة؟", "خروج الفراشة البالغة."], ["لماذا لا يكفي لون الحيوان وحده لتصنيفه علميًا؟", "لأن اللون قد يشترك فيه حيوانات مختلفة، فتستخدم عدة خصائص."], ["لماذا يعد وجود الريش سمة أفضل من لون الجسم لتصنيف الطيور؟", "لأن الريش صفة مشتركة مميزة للطيور."], ["إذا انخفض عدد الحشرات في موطن، كيف قد يتأثر طائر يتغذى عليها؟", "قد يقل غذاؤه فينخفض عدده أو يهاجر."], ["اختفى مصدر الماء من موطن؛ لماذا قد تنخفض أعداد جماعات متعددة؟", "لأن الماء حاجة أساسية مشتركة لها."], ["ازداد الرعي بشدة فانخفض الغطاء النباتي؛ ما الأثر المرجح على النظام؟", "نقص الغذاء لبعض المستهلكات واختلال الاتزان."], ["انخفضت أعداد المفترسات فجأة؛ ماذا قد يحدث لأعداد الفرائس أولًا؟", "قد تزداد أعداد الفرائس."], ["لماذا تتناقص الطاقة المتاحة كلما ارتفعنا في السلسلة الغذائية؟", "لأن جزءًا منها يستخدم في العمليات الحيوية ويتبدد كحرارة."], ["كيف يؤثر اختفاء المنتجات في بقية المستويات الغذائية؟", "يقل مصدر الطاقة والغذاء للمستهلكات."], ["إذا ارتفعت الحرارة واختفت مصادر الظل، فأي الحيوانات أقدر على البقاء؟", "الأقدر على تحمل الحرارة أو تجنبها بتكيف مناسب."], ["لماذا تكون الأذنان الكبيرتان مفيدتين لبعض حيوانات الصحراء؟", "تساعدان على فقد الحرارة."], ["تناقصت الطيور بعد تراكم النفايات؛ ما تفسير محتمل؟", "تضرر الغذاء أو الموطن أو ابتلاع النفايات."], ["زادت الأسماك بعد منع رمي المخلفات؛ ما العلاقة المحتملة؟", "تحسن جودة الماء والموطن."], ["أبوان يحملان صفة سائدة وأظهرا أبناء بصفة متنحية؛ ما التفسير؟", "قد يحمل كلا الوالدين الأليل المتنحي دون ظهوره."], ["لماذا يختلف طول نباتين متماثلين وراثيًا إذا اختلف الماء والضوء؟", "لتأثير الظروف البيئية في نموهما."], ["لماذا يتمدد الهواء داخل بالون عند رفع حرارته؟", "لأن جسيماته تتحرك أسرع وتتباعد."], ["إذا برد بخار الماء فتحول قطرات؛ ما العملية؟", "التكاثف."], ["لماذا يصلح التبخير لفصل ملح مذاب في الماء؟", "لأن الماء يتبخر ويبقى الملح."], ["لماذا لا يمكن فصل مركب كيميائي بالترشيح المعتاد؟", "لأن مكوناته مرتبطة كيميائيًا وليست جسيمات مخلوطًا فقط."], ["كيف تفسر ثبات الكتلة مع ظهور مادة جديدة؟", "تعاد ترتيبات الذرات ولا تُفقد في النظام المغلق."], ["إذا بدا أن الكتلة نقصت في كأس مفتوح بعد التفاعل فما الاحتمال؟", "هروب غاز إلى الهواء."], ["إذا مزج حمض وقاعدة بنسب مناسبة، فماذا ينتج عادة؟", "ملح وماء في تفاعل تعادل."], ["تحول الكاشف إلى لون يدل على الحمضية؛ ماذا نستنتج؟", "أن المحلول حمضي بحسب دلالة ذلك الكاشف."], ["لماذا تتسارع عربة عند دفعها بقوة أكبر من المقاومة؟", "لأن القوى غير متزنة ومحصّلتها في اتجاه الدفع."], ["لماذا يتباطأ جسم ينزلق على سطح خشن؟", "لأن الاحتكاك يعاكس حركته."], ["لماذا يميل الراكب إلى الأمام عند توقف السيارة فجأة؟", "بسبب القصور الذاتي وفق قانون نيوتن الأول."], ["قطعت سيارتان المسافة نفسها واحتاجت الأولى وقتًا أقل؛ أيهما أسرع؟", "الأولى لأنها استغرقت زمنًا أقل."], ["لماذا يسقط الجسم في الهواء أبطأ من سقوطه في الفراغ؟", "بسبب مقاومة الهواء المعاكسة للحركة."], ["لماذا يسهل المستوى المائل رفع صندوق مقارنة برفعه رأسيًا؟", "يقلل القوة اللازمة مقابل زيادة المسافة."], ["انخفضت طاقة وضع كرة أثناء سقوطها؛ إلى ماذا تتحول أساسًا؟", "إلى طاقة حركية."], ["لماذا لا يسمع رواد الفضاء الأصوات مباشرة عبر الفراغ؟", "لأن الصوت يحتاج إلى وسط مادي."], ["أي خاصية للصوت تتأثر بزيادة تردد الموجة؟", "تزداد حدة الصوت."], ["لماذا تنطفئ المصابيح جميعها في دائرة توالٍ عند قطع مسار واحد؟", "لأن المسار الكهربائي الوحيد انقطع."], ["لماذا يمكن إيقاف جذب المغناطيس الكهربائي للأشياء؟", "لأن قوته ترتبط بمرور التيار الذي يمكن قطعه."], ["هل ينتج تغير الأطوار عن تغير شكل القمر الحقيقي؟", "لا، بل عن اختلاف الجزء المضاء المرئي."], ["لماذا لا تتزامن الفصول في نصفي الأرض الشمالي والجنوبي؟", "لاختلاف زاوية سقوط أشعة الشمس بسبب ميل المحور."], ["كيف سيتغير المد والجزر إذا ضعفت قوة جذب القمر للأرض؟", "ستنخفض مساهمة القمر في المد والجزر."], ["لماذا لا يصح القول إن الشمس أكبر نجم في الكون؟", "لوجود نجوم أكبر منها وهي نجم ضمن مجرة واحدة."], ["لماذا يتحرك الهواء من مكان لآخر؟", "لاختلاف الضغط الناتج جزئيًا عن اختلاف التسخين."], ["لماذا تتشكل جبال عند تصادم صفائح قارية؟", "بسبب ضغط القشرة وارتفاعها والتوائها."], ["لماذا تتراكم الرواسب عند انخفاض سرعة النهر؟", "لانخفاض قدرته على حمل المواد فيترسب بعضها."], ["ما الدليل الذي يرجح أن صخرًا رسوبيًا تشكّل من تراكم طبقات؟", "ظهور طبقات أو حبيبات مترسبة متماسكة."], ["لماذا تكثر الزلازل قرب حدود الصفائح؟", "بسبب تراكم الإجهاد وانطلاقه عند حركة الصفائح."]]}, "g6-ara": {"1": [["ما علامة رفع الأسماء الخمسة بشروطها؟", "الواو."], ["ما أسلوب الأمر؟", "طلب القيام بالفعل."], ["ما علامة نصب جمع المذكر السالم؟", "الياء."], ["اذكر ثلاثة من حروف العطف.", "الواو والفاء وثم."], ["ما حروف العلة؟", "الألف والواو والياء."], ["ما أسلوب التعجب؟", "أسلوب يُظهر الدهشة أو الإعجاب."], ["ما علامة رفع المثنى؟", "الألف."], ["ما علامة نصب المفعول به المفرد؟", "الفتحة."], ["ما الأداة الشائعة لأسلوب النهي؟", "لا الناهية."], ["ما علامة رفع جمع التكسير؟", "الضمة."], ["ما معنى التوكيد؟", "تابع يثبت المعنى ويزيل احتمال الشك أو المجاز."], ["ما نوع الفعل «يكتب» من حيث الزمن؟", "مضارع."], ["ما علامة جر المثنى؟", "الياء."], ["ما أداة الاستفهام التي نسأل بها عن المكان؟", "أين."], ["ما العناصر الأساسية للقصة؟", "الشخصيات والزمان والمكان والأحداث والحبكة."], ["ماذا تفيد الفاء في العطف؟", "الترتيب مع التعقيب."], ["ما علامة رفع جمع المذكر السالم؟", "الواو."], ["ما علامة رفع الخبر المفرد؟", "الضمة."], ["ما نوع الفعل «اكتبْ» من حيث الزمن؟", "أمر."], ["على ماذا تُكتب الهمزة المتطرفة بعد فتحة؟", "على الألف."], ["ما الركنان الأساسيان للجملة الفعلية؟", "الفعل والفاعل."], ["ما أسلوب النهي؟", "طلب الكف عن الفعل."], ["ما الاسم المقصور؟", "اسم معرب آخره ألف لازمة."], ["ما الفرق بين الجملة الاسمية والفعلية؟", "الاسمية تبدأ باسم، والفعلية تبدأ بفعل."], ["ما الفكرة الرئيسة؟", "الفكرة الأساسية التي يدور حولها النص."], ["ما أداة الاستفهام التي نسأل بها عن السبب؟", "لماذا."], ["ما الفعل المعتل؟", "ما كان أحد حروفه الأصلية حرف علة."], ["ما المنعوت؟", "الاسم الذي يصفه النعت."], ["أين تقع الهمزة المتطرفة؟", "في آخر الكلمة."], ["ما أداة الاستفهام التي نسأل بها عن الزمان؟", "متى."], ["ما الاستنتاج؟", "الوصول إلى معنى غير مصرح به اعتمادًا على قرائن."], ["ما علامة نصب المثنى؟", "الياء."], ["ما الفرق بين الرأي والحقيقة؟", "الحقيقة قابلة للتحقق، والرأي يعبر عن وجهة نظر."], ["ما علامة جر جمع المذكر السالم؟", "الياء."], ["كيف تُكتب الهمزة المتطرفة بعد حرف ساكن؟", "على السطر غالبًا."], ["ما المقصود بالنعت؟", "تابع يصف اسمًا قبله."], ["على ماذا تُكتب الهمزة المتطرفة بعد ضمة؟", "على الواو."], ["ما علامة رفع جمع المؤنث السالم؟", "الضمة."], ["ما معنى العطف؟", "ربط لفظ بآخر بواسطة حرف عطف."], ["ما علامة نصب جمع المؤنث السالم؟", "الكسرة."], ["ما الفعل الصحيح؟", "ما خلت حروفه الأصلية من أحرف العلة."], ["ماذا تفيد «ثم» في العطف؟", "الترتيب مع التراخي."], ["على ماذا تُكتب الهمزة المتطرفة بعد كسرة؟", "على الياء (نبرة)."], ["ما علامة رفع المبتدأ المفرد؟", "الضمة."], ["ما الركنان الأساسيان للجملة الاسمية؟", "المبتدأ والخبر."], ["ما التلخيص؟", "إعادة صياغة الأفكار الأساسية بإيجاز."], ["ما علامة جر الاسم المفرد؟", "الكسرة."], ["ما الدليل النصي؟", "عبارة أو معلومة من النص تسند الإجابة."], ["ما نوع الفعل «كتب» من حيث الزمن؟", "ماضٍ."], ["ما الاسم المنقوص؟", "اسم معرب آخره ياء لازمة مكسور ما قبلها."]]}};
+const GRADES = [{id:3,nm:"الثالث"},{id:4,nm:"الرابع"},{id:5,nm:"الخامس"},{id:6,nm:"السادس"}];
+const SUBJECTS = [{id:"sci",nm:"العلوم",ic:"🔬"},{id:"ara",nm:"لغتي",ic:"📖"},{id:"math",nm:"الرياضيات",ic:"📐"}];
+const STAGE_NM = {"1":"المرحلة الأولى","2":"المرحلة الثانية","3":"المرحلة الثالثة"};
+
+const $ = s=>document.querySelector(s);
+const app = $("#app");
+const AR = n=>String(n);
+const EN = s=>String(s).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2200)}
+function confirmBox(msg){return new Promise(r=>{$("#modalMsg").textContent=msg;$("#modal").classList.add("show");
+  $("#mYes").onclick=()=>{$("#modal").classList.remove("show");r(true)};$("#mNo").onclick=()=>{$("#modal").classList.remove("show");r(false)}})}
+
+if(LOGOS.moe && !LOGOS.moe.startsWith("__")){$("#logoMoe").src=LOGOS.moe;$("#logoMoe").classList.add("show")}
+
+/* ---------- storage of added questions ---------- */
+let db=null, custom={}, over={}, storeMode="local";
+const LS_KEY="manahij-custom-v1", LS_OVER="manahij-over-v1";
+try{custom=JSON.parse(localStorage.getItem(LS_KEY)||"{}")}catch(e){custom={}}
+try{over=JSON.parse(localStorage.getItem(LS_OVER)||"{}")}catch(e){over={}}
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(custom));localStorage.setItem(LS_OVER,JSON.stringify(over))}catch(e){}}
+/* Supabase (للنسخة المستقلة على Render) — اتركها فارغة للحفظ المحلي */
+const SB={url:"__SB_URL__",key:"__SB_KEY__"};
+const SB_ON=/^https:\/\//.test(SB.url)&&SB.key.length>20;
+let sbLast=0;
+function sbHeaders(){return {apikey:SB.key,Authorization:"Bearer "+SB.key,"Content-Type":"application/json"}}
+async function sbLoad(){
+  if(!SB_ON)return; sbLast=Date.now();
+  try{const r=await fetch(SB.url+"/rest/v1/manahij_banks?select=key,items,over",{headers:sbHeaders()});
+    if(!r.ok)throw new Error(r.status);
+    const rows=await r.json(), next={}, nextO={};
+    rows.forEach(x=>{next[x.key]=x.items||[];nextO[x.key]=x.over||{}});
+    custom=next; over=nextO; saveLocal(); if(view.rerender) view.rerender();
+  }catch(e){console.warn(e);toast("تعذّر الاتصال بقاعدة البيانات، يُعرض المحفوظ على هذا الجهاز")}
+}
+if(SB_ON){storeMode="db";sbLoad();setInterval(()=>{if(!document.hidden&&!$("#award"))sbLoad()},30000)}
+(async()=>{
+  try{
+    if(SB_ON||!window.claude||!claude.use) return;
+    const d = await claude.use("db"); if(!d) return;
+    db=d; storeMode="db";
+    db.collection("banks").onSnapshot(snap=>{
+      const next={},nextO={};
+      (snap.docs||snap).forEach(doc=>{const data=typeof doc.data==="function"?doc.data():doc.data; const id=doc.id; if(!data)return; if(Array.isArray(data.items)) next[id]=data.items; if(data.over&&typeof data.over==="object") nextO[id]=data.over});
+      custom=next; over=nextO; saveLocal(); if(view.rerender) view.rerender();
+    },err=>{console.warn(err)});
+  }catch(e){console.warn(e)}
+})();
+async function saveBank(key){
+  saveLocal();
+  if(SB_ON){try{const r=await fetch(SB.url+"/rest/v1/manahij_banks",{method:"POST",headers:{...sbHeaders(),Prefer:"resolution=merge-duplicates,return=minimal"},
+      body:JSON.stringify([{key,items:custom[key]||[],over:over[key]||{},updated_at:new Date().toISOString()}])});if(!r.ok)throw new Error(r.status)}
+    catch(e){console.warn(e);toast("تعذّر الحفظ في قاعدة البيانات، حُفظ على هذا الجهاز فقط")}return}
+  if(db){try{await db.collection("banks").doc(key).set({items:custom[key]||[],over:over[key]||{}})}catch(e){toast("تعذّر الحفظ في قاعدة البيانات، حُفظ على هذا الجهاز فقط")}}
+}
+
+function bankKey(g,s){return "g"+g+"-"+s}
+function getStages(g,s){
+  const k=bankKey(g,s), out={};
+  const b=BUILTIN[k]||{};
+  const ov=over[k]||{};
+  for(const st in b){out[st]=[];b[st].forEach(([q,a],i)=>{const id="b:"+st+":"+i,o=ov[id];if(o&&o.del)return;
+    out[st].push({q:o&&o.q||q,a:o&&o.a||a,src:"b",id,num:i+1,edited:!!(o&&(o.q||o.a))})})}
+  const nextNum={};(custom[k]||[]).forEach((it,i)=>{const st=it.stage;nextNum[st]=nextNum[st]||((b[st]||[]).length+1);
+    (out[st]=out[st]||[]).push({q:it.q,a:it.a,src:"c",idx:i,id:"c:"+i,num:nextNum[st]++})});
+  for(const st in out){if(!out[st].length)delete out[st]}
+  return out;
+}
+function countAll(g,s){return Object.values(getStages(g,s)).reduce((n,a)=>n+a.length,0)}
+
+/* ---------- views ---------- */
+let view={};
+const sel={grade:null,subject:null};
+let confRun=0;
+function go(fn){view={rerender:null};confRun++;stopTimer();app.innerHTML="";fn();window.scrollTo(0,0)}
+function crumbs(parts){return `<div class="crumbs">${parts.map((p,i)=>p.fn?`<a data-c="${i}">${p.t}</a>`:`<span>${p.t}</span>`).join("<span>‹</span>")}</div>`}
+function bindCrumbs(parts){app.querySelectorAll("[data-c]").forEach(a=>a.onclick=()=>parts[+a.dataset.c].fn())}
+
+function home(){go(()=>{
+  const render=()=>{
+  app.innerHTML=`<h2 class="sec-title">اختر الصف</h2><p class="sec-sub">مسابقة تنافسية بين فريقين في مواد الصفوف العليا</p>
+  <div class="grid">${GRADES.map(g=>{const n=SUBJECTS.reduce((t,s)=>t+countAll(g.id,s.id),0);
+    return `<div class="card" data-g="${g.id}"><div class="band"></div><div class="big">${AR(g.id)}</div><div class="nm">الصف ${g.nm}</div>
+    <div class="meta">${n?`<span class="pill">${AR(n)} سؤالًا</span>`:`<span class="pill empty">لا توجد أسئلة بعد</span>`}</div></div>`}).join("")}</div>`;
+  app.querySelectorAll("[data-g]").forEach(c=>c.onclick=()=>{sel.grade=+c.dataset.g;subjects()});};
+  view.rerender=render;render();
+})}
+
+function subjects(){go(()=>{
+  const g=GRADES.find(x=>x.id===sel.grade);
+  const parts=[{t:"الصفوف",fn:home},{t:"الصف "+g.nm}];
+  const render=()=>{
+  app.innerHTML=crumbs(parts)+`<h2 class="sec-title">الصف ${g.nm} — اختر المادة</h2><p class="sec-sub">ثلاث مواد، لكل مادة بنك أسئلة خاص</p>
+  <div class="grid">${SUBJECTS.map(s=>{const n=countAll(g.id,s.id),st=Object.keys(getStages(g.id,s.id)).length;
+    return `<div class="card" data-s="${s.id}"><div class="band"></div><div class="ic">${s.ic}</div><div class="nm">${s.nm}</div>
+    <div class="meta">${n?`<span class="pill">${AR(n)} سؤالًا${st>1?" · "+AR(st)+" مراحل":""}</span>`:`<span class="pill empty">لا توجد أسئلة — أضفها</span>`}</div></div>`}).join("")}</div>`;
+  bindCrumbs(parts);
+  app.querySelectorAll("[data-s]").forEach(c=>c.onclick=()=>{sel.subject=c.dataset.s;setup()});};
+  view.rerender=render;render();
+})}
+
+const TEAM_COLORS=[{c:"#1d5fbf",bg:"#e7effc"},{c:"#d4651a",bg:"#fdeee3"},{c:"#1f8a4c",bg:"#e5f4ec"},{c:"#7a3fb5",bg:"#f1e9fa"},{c:"#c23a6b",bg:"#fbe8ef"},{c:"#9a7410",bg:"#f8f0d9"}];
+const ORD=["الأول","الثاني","الثالث","الرابع","الخامس","السادس"];
+const tc=i=>`--c:${TEAM_COLORS[i].c};--bg:${TEAM_COLORS[i].bg}`;
+const setupState={size:"m",order:"random",stage:"all",count:"all",timer:30,points:1,teamCount:2,teams:["","","","","",""]};
+function setup(){go(()=>{
+  const g=GRADES.find(x=>x.id===sel.grade), s=SUBJECTS.find(x=>x.id===sel.subject);
+  const parts=[{t:"الصفوف",fn:home},{t:"الصف "+g.nm,fn:subjects},{t:s.nm}];
+  const keepNames=()=>app.querySelectorAll(".tIn").forEach(i=>setupState.teams[+i.dataset.i]=i.value);
+  const render=()=>{
+  const stages=getStages(g.id,s.id), keys=Object.keys(stages).sort(), total=countAll(g.id,s.id);
+  if(setupState.stage!=="all"&&!stages[setupState.stage]) setupState.stage="all";
+  const avail=setupState.stage==="all"?total:stages[setupState.stage].length;
+  const chip=(grp,val,txt)=>`<button class="chip ${String(setupState[grp])===String(val)?"on":""}" data-grp="${grp}" data-v="${val}">${txt}</button>`;
+  app.innerHTML=crumbs(parts)+`<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+    <div><h2 class="sec-title">${s.ic} ${s.nm} — الصف ${g.nm}</h2><p class="sec-sub" style="margin:0">سجّل الفرق واضبط إعدادات الجولة</p></div>
+    <button class="btn ghost sm" id="adminBtn">✎ إدارة الأسئلة (${total})</button></div>
+  ${total===0?`<div class="panel" style="text-align:center"><h3 style="margin-top:0">لا توجد أسئلة لهذه المادة بعد</h3><p class="sec-sub">أضف الأسئلة أولًا، ثم ابدأ المسابقة.</p><button class="btn gold" id="adminBtn2">+ إضافة أسئلة</button></div>`:`
+  <div class="panel">
+    <label class="f">عدد الفرق المشاركة</label><div class="chips">${[2,3,4,5,6].map(n=>chip("teamCount",n,n+" فرق")).join("").replace(">2 فرق<",">فريقان<")}</div>
+    <div class="team-grid">${Array.from({length:setupState.teamCount},(_,i)=>`<div class="team-in" style="${tc(i)}"><label class="f">الفريق ${ORD[i]}</label><input class="t tIn" data-i="${i}" placeholder="اسم الفريق ${ORD[i]}" value="${esc(setupState.teams[i])}"></div>`).join("")}</div>
+    <div class="row" style="margin-top:24px">
+      ${keys.length>1?`<div><label class="f">المرحلة</label><div class="chips">${chip("stage","all","كل المراحل")}${keys.map(k=>chip("stage",k,(STAGE_NM[k]||"المرحلة "+k)+" ("+stages[k].length+")")).join("")}</div></div>`:""}
+      <div><label class="f">عدد الأسئلة</label><div class="chips">${[10,20,30].filter(n=>n<avail).map(n=>chip("count",n,n)).join("")}${chip("count","all","الكل ("+avail+")")}</div></div>
+    </div>
+    <div class="row" style="margin-top:20px">
+      <div><label class="f">وقت السؤال</label><div class="chips">${chip("timer",0,"بلا مؤقت")}${chip("timer",15,"15 ث")}${chip("timer",30,"30 ث")}${chip("timer",60,"60 ث")}</div></div>
+      <div><label class="f">ترتيب عرض الأسئلة</label><div class="chips">${chip("order","random","🎲 عشوائي")}${chip("order","seq","بترتيب البنك")}</div></div>
+    </div>
+    <div class="row" style="margin-top:20px">
+      <div><label class="f">حجم ظهور السؤال</label><div class="chips">${chip("size","s","صغير")}${chip("size","m","متوسط")}${chip("size","l","كبير")}</div></div>
+      <div><label class="f">نقاط الإجابة الصحيحة</label><div class="chips">${chip("points",1,"1")}${chip("points",2,"2")}${chip("points",5,"5")}${chip("points",10,"10")}</div></div>
+    </div>
+    <div class="actions"><button class="btn gold" id="startBtn">▶ ابدأ المسابقة</button></div>
+  </div>`}`;
+  bindCrumbs(parts);
+  const a=$("#adminBtn"),a2=$("#adminBtn2"); a.onclick=admin; if(a2)a2.onclick=admin;
+  app.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{keepNames();const v=c.dataset.v; setupState[c.dataset.grp]=isNaN(+v)?v:+v; render()});
+  const sb=$("#startBtn"); if(sb) sb.onclick=()=>{
+    keepNames();
+    let pool=setupState.stage==="all"?keys.flatMap(k=>stages[k].map(x=>({...x,stage:k}))):stages[setupState.stage].map(x=>({...x,stage:setupState.stage}));
+    if(setupState.order==="random") pool=shuffle(pool); if(setupState.count!=="all") pool=pool.slice(0,setupState.count);
+    const teams=Array.from({length:setupState.teamCount},(_,i)=>setupState.teams[i].trim()||"الفريق "+ORD[i]);
+    startGame({size:setupState.size,random:setupState.order==="random",pool,teams,timer:setupState.timer,points:setupState.points,multiStage:keys.length>1&&setupState.stage==="all"});
+  };};
+  view.rerender=()=>{keepNames();render()};render();
+})}
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* ---------- game ---------- */
+let G=null, tHandle=null;
+function stopTimer(){clearInterval(tHandle);tHandle=null}
+let actx=null;
+function beep(freqs,dur=.12){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();let t=actx.currentTime;
+  freqs.forEach(f=>{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;o.type="triangle";g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+dur);t+=dur*.9})}catch(e){}}
+
+function startGame(cfg){G={...cfg,i:0,score:cfg.teams.map(()=>0),revealed:false,awarded:false,history:[],drawn:{}};go(renderQ)}
+function renderQ(){
+  stopTimer();
+  const q0=G.pool[G.i], q={...q0,q:EN(q0.q),a:EN(q0.a)}, s=SUBJECTS.find(x=>x.id===sel.subject), g=GRADES.find(x=>x.id===sel.grade);
+  const N=G.teams.length, max=Math.max(...G.score), leaders=G.score.filter(x=>x===max).length;
+  const cols=N<=3?N:(N===4?4:N);
+  app.innerHTML=`
+  <div class="board ${N>3?"many":""}" style="grid-template-columns:repeat(${cols},1fr)">
+    ${G.teams.map((nm,i)=>`<div class="score ${max>0&&G.score[i]===max&&leaders<N?"lead":""}" id="sc${i}" style="${tc(i)}"><div class="n" title="${esc(nm)}">${esc(nm)}</div>
+      <div class="rt"><div class="p">${G.score[i]}</div><div class="adj"><button data-adj="${i},1">+</button><button data-adj="${i},-1">−</button></div></div></div>`).join("")}
+  </div>
+  <div class="qcard sz-${G.size||"m"}">
+    <div class="szbox" title="حجم السؤال">${[["s","ص"],["m","م"],["l","ك"]].map(([k,l])=>`<button data-sz="${k}" class="${(G.size||"m")===k?"on":""}">${l}</button>`).join("")}</div>
+    <div class="qnum">السؤال<b>${G.i+1} / ${G.pool.length}</b>${s.nm} · ${g.nm}</div>
+    <span class="pill tag">${G.multiStage?(STAGE_NM[q.stage]||"المرحلة "+q.stage)+" · ":""}رقمه في البنك: ${q.num}</span>
+    <div class="qtext" id="qtext">${esc(q.q)}</div>
+    ${G.timer?`<div class="timer" id="tbar"><i></i></div><div class="tnum" id="tnum">${G.timer}</div>`:""}
+    <div class="ans ${G.revealed?"show":""}" id="ans">✔ ${esc(q.a)}</div>
+    <div class="actions" id="revealWrap" style="${G.revealed?"display:none":""}"><button class="btn" id="revealBtn">إظهار الإجابة</button></div>
+    <div class="award" id="award" style="grid-template-columns:repeat(${Math.min(N,3)},1fr)">
+      ${G.teams.map((nm,i)=>`<button data-w="${i}" style="${tc(i)}" ${G.awarded?"disabled":""}>✓ ${esc(nm)}</button>`).join("")}
+    </div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn ghost sm" data-w="-1" ${G.awarded?"disabled":""}>✗ لم يُجب أحد</button>
+      ${G.history.length?`<button class="btn ghost sm" id="undoBtn">↶ تراجع</button>`:""}
+      <button class="btn ${G.awarded?"":"ghost"} sm" id="skipBtn">${G.awarded?"السؤال التالي ←":"تخطٍّ ←"}</button>
+      <button class="btn ghost sm" id="endBtn">إنهاء المسابقة</button>
+    </div>
+    <div class="hint">اختصارات: مسافة = إظهار الإجابة · ${G.teams.map((nm,i)=>`${i+1} = ${esc(nm)}`).join(" · ")} · 0 = لم يُجب أحد · ← = التالي</div>
+  </div>`;
+  $("#revealBtn")&&($("#revealBtn").onclick=reveal);
+  app.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>award(+b.dataset.w));
+  app.querySelectorAll("[data-adj]").forEach(b=>b.onclick=()=>{const [t,d]=b.dataset.adj.split(",").map(Number);G.score[t]=Math.max(0,G.score[t]+d);renderQ()});
+  $("#skipBtn").onclick=next; $("#endBtn").onclick=async()=>{if(await confirmBox("إنهاء المسابقة وعرض النتيجة؟"))finish()};
+  $("#undoBtn")&&($("#undoBtn").onclick=undo);
+  app.querySelectorAll("[data-sz]").forEach(b=>b.onclick=()=>{G.size=setupState.size=b.dataset.sz;const c=$(".qcard");c.classList.remove("sz-s","sz-m","sz-l");c.classList.add("sz-"+G.size);
+    app.querySelectorAll("[data-sz]").forEach(x=>x.classList.toggle("on",x.dataset.sz===G.size))});
+  if(G.random&&!G.drawn[G.i]){drawAnim();return}
+  if(G.timer&&!G.revealed&&!G.awarded) runTimer(); else if(G.timer){$("#tbar").style.visibility="hidden";$("#tnum").style.visibility="hidden"}
+}
+function drawAnim(){
+  const card=$(".qcard"); card.classList.add("drawing");
+  const tag=card.querySelector(".tag"), qt=$("#qtext"), max=Math.max(...G.pool.map(x=>x.num));
+  qt.innerHTML=`<span class="dice">🎲</span><div class="roll">?</div><div class="sec-sub" style="margin:0">سحب سؤال عشوائي…</div>`;
+  const roll=qt.querySelector(".roll"); let n=0; const myI=G.i;
+  const h=setInterval(()=>{if(!roll.isConnected||G.i!==myI){clearInterval(h);return}roll.textContent=1+Math.floor(Math.random()*max);if(++n%2)beep([300+Math.random()*500],.04)},70);
+  setTimeout(()=>{clearInterval(h);if(G.i!==myI||!roll.isConnected)return;roll.textContent=G.pool[G.i].num;roll.classList.add("hit");beep([784,1046],.12);
+    setTimeout(()=>{if(G.i!==myI)return;G.drawn[G.i]=true;renderQ()},650)},1100);
+}
+function runTimer(){
+  let left=G.timer; const bar=$("#tbar i"),num=$("#tnum");
+  requestAnimationFrame(()=>{bar.style.width="100%"});
+  tHandle=setInterval(()=>{left--; if(!bar.isConnected){stopTimer();return}
+    bar.style.width=(left/G.timer*100)+"%"; num.textContent=Math.max(0,left);
+    if(left<=5) $("#tbar").classList.add("warn"); if(left<=5&&left>0) beep([880],.08);
+    if(left<=0){stopTimer();num.textContent="انتهى الوقت";beep([440,330],.25)}
+  },1000);
+}
+function reveal(){if(G.revealed)return;G.revealed=true;stopTimer();$("#ans").classList.add("show");$("#revealWrap").style.display="none"}
+function award(w){
+  if(G.awarded||w>=G.teams.length)return; G.awarded=true; G.revealed=true; G.drawn[G.i]=true;
+  G.history.push({i:G.i,w,pts:w>=0?G.points:0});
+  if(w>=0){G.score[w]+=G.points;beep([660,880,1100],.11)}
+  renderQ(); if(w>=0){$("#sc"+w).classList.add("pop")}
+}
+function undo(){const h=G.history.pop();if(!h)return; if(h.w>=0)G.score[h.w]-=h.pts; G.i=h.i;G.awarded=false;G.revealed=false;renderQ()}
+function next(){if(G.i>=G.pool.length-1){finish();return}G.i++;G.revealed=false;G.awarded=false;renderQ()}
+function finish(){stopTimer();
+  const max=Math.max(...G.score), winners=G.teams.filter((_,i)=>G.score[i]===max);
+  const order=G.teams.map((nm,i)=>({nm,i,s:G.score[i]})).sort((a,b)=>b.s-a.s);
+  const ranks=order.map(o=>1+order.filter(x=>x.s>o.s).length), medal=r=>["🥇","🥈","🥉"][r-1]||r;
+  const tie=winners.length>1||max===0;
+  app.innerHTML=`<div class="panel final">
+    <div class="crown">${tie?"🤝":"🏆"}</div>
+    <h2>${max===0?"لم يحصل أي فريق على نقاط":winners.length>1?"تعادل في الصدارة: "+winners.map(esc).join(" و"):"الفائز: "+esc(winners[0])}</h2>
+    <p class="sec-sub">${G.history.length} سؤالًا أُجيب عنها من ${G.pool.length}</p>
+    <div class="fs">${order.map((o,k)=>`<div class="${o.s===max&&max>0?"win":""}" style="${tc(o.i)}"><i>${medal(ranks[k])}</i>${esc(o.nm)}<b>${o.s}</b></div>`).join("")}</div>
+    <div class="actions"><button class="btn gold" id="again">مسابقة جديدة في المادة نفسها</button><button class="btn ghost" id="toHome">العودة للصفوف</button></div></div>`;
+  $("#again").onclick=setup; $("#toHome").onclick=home;
+  if(max>0){confetti();beep([523,659,784,1046],.18)}
+}
+
+/* ---------- admin ---------- */
+function admin(){go(()=>{
+  const g=GRADES.find(x=>x.id===sel.grade), s=SUBJECTS.find(x=>x.id===sel.subject), key=bankKey(g.id,s.id);
+  const parts=[{t:"الصفوف",fn:home},{t:"الصف "+g.nm,fn:subjects},{t:s.nm,fn:setup},{t:"إدارة الأسئلة"}];
+  let tab="add", addStage="1", listStage="all", search="", editId=null;
+  const render=()=>{
+  const stages=getStages(g.id,s.id), mine=(custom[key]||[]), builtinN=Object.values(BUILTIN[key]||{}).reduce((n,a)=>n+a.length,0);
+  app.innerHTML=crumbs(parts)+`<h2 class="sec-title">إدارة أسئلة ${s.nm} — الصف ${g.nm}</h2>
+  <p class="sec-sub">عدد الأسئلة الحالي: ${Object.values(stages).reduce((n,a)=>n+a.length,0)} · الأصلية: ${builtinN} · المضافة: ${mine.length}</p>
+  ${storeMode!=="db"?`<div class="note">الأسئلة المضافة تُحفظ على هذا الجهاز والمتصفح فقط. اربط الصفحة بقاعدة البيانات لتُحفظ وتظهر على كل الأجهزة.</div>`:""}
+  <div class="tabs"><button class="chip ${tab==="add"?"on":""}" data-tab="add">+ سؤال واحد</button><button class="chip ${tab==="bulk"?"on":""}" data-tab="bulk">لصق مجموعة أسئلة</button><button class="chip ${tab==="file"?"on":""}" data-tab="file">📄 استيراد من ملف PDF أو Word</button><button class="chip ${tab==="list"?"on":""}" data-tab="list">✎ عرض وتعديل الأسئلة</button></div>
+  <div class="panel">
+    <div style="margin-bottom:16px;${tab==="list"?"display:none":""}"><label class="f">المرحلة</label><div class="chips">${["1","2","3"].map(k=>`<button class="chip ${addStage===k?"on":""}" data-st="${k}">${STAGE_NM[k]}</button>`).join("")}</div></div>
+    ${tab==="add"?`
+      <label class="f">السؤال</label><textarea class="t" id="nq" rows="2"></textarea>
+      <label class="f" style="margin-top:14px">الإجابة</label><input class="t" id="na">
+      <div class="actions"><button class="btn" id="addOne">حفظ السؤال</button></div>`:""}
+    ${tab==="bulk"?`
+      <label class="f">اكتب كل سؤال في سطر، وافصل بينه وبين إجابته بعلامة | </label>
+      <textarea class="t" id="bulk" rows="10" placeholder="ما ناتج 7 × 8؟ | 56&#10;ما عدد أضلاع المسدس؟ | 6"></textarea>
+      <div class="actions"><button class="btn" id="addBulk">إضافة الأسئلة</button></div>`:""}
+    ${tab==="file"?`
+      <label class="f">اختر ملف Word (‎.docx) أو PDF يحتوي الأسئلة وإجاباتها</label>
+      <div class="drop" id="drop"><input type="file" id="fileIn" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+        <div style="font-size:40px">📄</div><b>اسحب الملف هنا أو اضغط للاختيار</b>
+        <div class="sec-sub" style="margin:6px 0 0;font-size:14px">الصيغ المدعومة: «س1: ... ج1: ...» أو «السؤال | الإجابة» في كل سطر، أو سؤال ينتهي بـ «؟» وإجابته في السطر التالي</div></div>
+      <div id="impOut"></div>`:""}
+    ${tab==="list"?(()=>{
+      const delN=Object.values(over[key]||{}).filter(o=>o.del).length, sk=Object.keys(stages).sort();
+      const norm=x=>x.replace(/[ًٌٍَُِّْـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");
+      const sq=norm(search.trim());
+      const rows=sk.filter(k=>listStage==="all"||listStage===k).flatMap(k=>{
+        const items=stages[k].filter(x=>!sq||norm(x.q+" "+x.a).includes(sq));
+        if(!items.length)return [];
+        return [`<h3 style="margin:12px 0 4px">${STAGE_NM[k]||"المرحلة "+k} (${items.length})</h3>`,...items.map(x=>editId===x.id?`
+          <div class="qi edit"><div class="x"><label class="f">السؤال ${x.num}</label><textarea class="t" id="eq" rows="2">${esc(x.q)}</textarea>
+            <label class="f" style="margin-top:8px">الإجابة</label><input class="t" id="ea" value="${esc(x.a)}">
+            ${x.src==="c"?`<label class="f" style="margin-top:8px">المرحلة</label><select class="t" id="es">${["1","2","3"].map(s=>`<option value="${s}" ${s===k?"selected":""}>${STAGE_NM[s]}</option>`).join("")}</select>`:""}
+            <div class="actions" style="justify-content:flex-start;margin-top:12px"><button class="btn sm" data-save="${x.id}">حفظ التعديل</button><button class="btn ghost sm" data-cancel>إلغاء</button>
+            ${x.edited?`<button class="btn ghost sm" data-revert="${x.id}">إرجاع النص الأصلي</button>`:""}</div></div></div>`:`
+          <div class="qi"><div class="x"><b>${x.num}. ${esc(EN(x.q))}</b><span>${esc(EN(x.a))}</span></div>
+            ${x.edited?`<span class="pill">معدّل</span>`:x.src==="c"?`<span class="pill">مضاف</span>`:""}
+            <button class="ed" data-edit="${x.id}">تعديل</button><button data-del="${x.id}">حذف</button></div>`)]});
+      return `<div class="row" style="align-items:flex-end;gap:12px"><div style="flex:2"><label class="f">بحث في الأسئلة</label><input class="t" id="srch" placeholder="اكتب كلمة من السؤال أو الإجابة" value="${esc(search)}"></div>
+        <div style="flex:3"><label class="f">المرحلة</label><div class="chips"><button class="chip ${listStage==="all"?"on":""}" data-ls="all">الكل</button>${sk.map(k=>`<button class="chip ${listStage===k?"on":""}" data-ls="${k}">${STAGE_NM[k]||k}</button>`).join("")}</div></div></div>
+        ${delN?`<div class="note" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px">حذفت ${delN} سؤالًا من الأسئلة الأصلية.<button class="btn ghost sm" id="restoreDel">استعادة المحذوفة</button></div>`:""}
+        <div class="qlist" id="qlist">${rows.join("")||'<p class="sec-sub">لا توجد أسئلة مطابقة.</p>'}</div>`})():""}
+  </div>
+  <div class="actions"><button class="btn gold" id="toSetup">الذهاب إلى المسابقة ←</button></div>`;
+  bindCrumbs(parts); $("#toSetup").onclick=setup;
+  app.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
+  app.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{addStage=b.dataset.st;const q=$("#nq")?.value,a=$("#na")?.value,bk=$("#bulk")?.value;render();if($("#nq")){$("#nq").value=q||"";$("#na").value=a||""}if($("#bulk"))$("#bulk").value=bk||""});
+  if($("#addOne")) $("#addOne").onclick=async()=>{const q=$("#nq").value.trim(),a=$("#na").value.trim();if(!q||!a){toast("اكتب السؤال والإجابة");return}
+    (custom[key]=custom[key]||[]).push({q:EN(q),a:EN(a),stage:addStage});await saveBank(key);toast("تمت إضافة السؤال ✓");render();$("#nq").focus()};
+  if($("#addBulk")) $("#addBulk").onclick=async()=>{const lines=$("#bulk").value.split("\n").map(l=>l.trim()).filter(Boolean);let n=0,bad=0;
+    custom[key]=custom[key]||[];lines.forEach(l=>{const p=l.split("|");if(p.length<2||!p[0].trim()||!p.slice(1).join("|").trim()){bad++;return}custom[key].push({q:EN(p[0].trim()),a:EN(p.slice(1).join("|").trim()),stage:addStage});n++});
+    if(n)await saveBank(key);toast(`أُضيف ${AR(n)} سؤالًا${bad?` · ${AR(bad)} سطر بلا علامة |`:""}`);if(n){tab="list";render()}};
+  if($("#drop")){const fi=$("#fileIn"),dr=$("#drop");dr.onclick=()=>fi.click();
+    dr.ondragover=e=>{e.preventDefault();dr.classList.add("over")};dr.ondragleave=()=>dr.classList.remove("over");
+    dr.ondrop=e=>{e.preventDefault();dr.classList.remove("over");if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])};
+    fi.onchange=()=>{if(fi.files[0])handleFile(fi.files[0])};}
+  async function handleFile(f){const out=$("#impOut");out.innerHTML=`<p class="sec-sub" style="text-align:center;margin-top:16px">جارٍ قراءة «${esc(f.name)}»…</p>`;
+    let lines;try{lines=await readFileLines(f)}catch(e){console.warn(e);out.innerHTML=`<div class="note" style="margin-top:16px">تعذّرت قراءة الملف. تأكد أنه ‎.docx أو PDF نصّي (ليس صورة ممسوحة).</div>`;return}
+    const items=parseQA(lines);
+    if(!items.length){out.innerHTML=`<div class="note" style="margin-top:16px">لم أجد أسئلة بصيغة معروفة في الملف. اكتب كل سؤال بصيغة «س1: ... ج1: ...» أو «السؤال | الإجابة».</div>`;return}
+    out.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px;flex-wrap:wrap;gap:8px"><b>وُجد ${items.length} سؤالًا — راجعها وعدّل ما يلزم قبل الإضافة إلى ${STAGE_NM[addStage]}</b>
+      <label style="font-weight:700"><input type="checkbox" id="impAll" checked> تحديد الكل</label></div>
+      <div class="qlist">${items.map((x,i)=>`<div class="qi imp"><input type="checkbox" class="impC" data-i="${i}" checked style="width:20px;height:20px;margin-top:10px">
+        <div class="x"><input class="t impQ" value="${esc(x.q)}"><input class="t impA" value="${esc(x.a)}" style="margin-top:6px;color:var(--teal2)"></div></div>`).join("")}</div>
+      <div class="actions"><button class="btn" id="impGo">إضافة الأسئلة المحددة</button></div>`;
+    $("#impAll").onchange=e=>app.querySelectorAll(".impC").forEach(c=>c.checked=e.target.checked);
+    $("#impGo").onclick=async()=>{let n=0;custom[key]=custom[key]||[];
+      app.querySelectorAll(".qi.imp").forEach(r=>{if(!r.querySelector(".impC").checked)return;const q=r.querySelector(".impQ").value.trim(),a=r.querySelector(".impA").value.trim();if(q&&a){custom[key].push({q:EN(q),a:EN(a),stage:addStage});n++}});
+      if(!n){toast("لم تحدد أي سؤال");return}await saveBank(key);toast(`أُضيف ${n} سؤالًا ✓`);tab="list";render()};
+  }
+  const keepScroll=fn=>async(...a)=>{const l=$("#qlist"),y=l?l.scrollTop:0;await fn(...a);const l2=$("#qlist");if(l2)l2.scrollTop=y};
+  if($("#srch")){$("#srch").oninput=e=>{search=e.target.value;const pos=e.target.selectionStart;render();const s2=$("#srch");s2.focus();s2.setSelectionRange(pos,pos)}}
+  app.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{listStage=b.dataset.ls;render()});
+  app.querySelectorAll("[data-edit]").forEach(b=>b.onclick=keepScroll(()=>{editId=b.dataset.edit;render();$("#eq")&&$("#eq").focus()}));
+  app.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=keepScroll(()=>{editId=null;render()}));
+  app.querySelectorAll("[data-save]").forEach(b=>b.onclick=keepScroll(async()=>{const id=b.dataset.save,q=EN($("#eq").value.trim()),a=EN($("#ea").value.trim());
+    if(!q||!a){toast("السؤال والإجابة مطلوبان");return}
+    if(id.startsWith("c:")){const it=custom[key][+id.slice(2)];it.q=q;it.a=a;if($("#es"))it.stage=$("#es").value}
+    else{(over[key]=over[key]||{})[id]={q,a}}
+    editId=null;await saveBank(key);toast("حُفظ التعديل ✓");render()}));
+  app.querySelectorAll("[data-revert]").forEach(b=>b.onclick=keepScroll(async()=>{delete (over[key]||{})[b.dataset.revert];editId=null;await saveBank(key);toast("أُرجع النص الأصلي");render()}));
+  if($("#restoreDel")) $("#restoreDel").onclick=async()=>{const o=over[key]||{};for(const id in o)if(o[id].del)delete o[id];await saveBank(key);toast("استُعيدت الأسئلة المحذوفة");render()};
+  app.querySelectorAll("[data-del]").forEach(b=>b.onclick=keepScroll(async()=>{if(!await confirmBox("حذف هذا السؤال؟"))return;const id=b.dataset.del;
+    if(id.startsWith("c:")){custom[key].splice(+id.slice(2),1)}else{(over[key]=over[key]||{})[id]={del:true}}
+    if(editId===id)editId=null;await saveBank(key);render()}));
+  };
+  view.rerender=()=>{if(editId===null&&(!document.activeElement||!/TEXTAREA|INPUT|SELECT/.test(document.activeElement.tagName)))render()};render();
+})}
+
+/* ---------- file import ---------- */
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`)){res();return}const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+function pdfPageLines(items){
+  items=items.filter(it=>it.str.trim()).map(it=>({x:it.transform[4],w:it.width||0,y:it.transform[5],s:it.str}));
+  if(!items.length)return [];
+  const minX=Math.min(...items.map(i=>i.x)),maxX=Math.max(...items.map(i=>i.x+i.w)),mid=(minX+maxX)/2;
+  const group=list=>{const rows=[];list.forEach(it=>{let r=rows.find(r=>Math.abs(r.y-it.y)<3);if(!r){r={y:it.y,items:[]};rows.push(r)}r.items.push(it)});
+    return rows.sort((a,b)=>b.y-a.y).map(r=>r.items.sort((a,b)=>b.x-a.x).map(i=>i.s).join(" ").replace(/\s+/g," ").trim())};
+  const rows=group(items).length, crossing=items.filter(i=>i.x<mid-4&&i.x+i.w>mid+4).length;
+  const right=items.filter(i=>i.x>=mid), left=items.filter(i=>i.x+i.w<=mid);
+  // two-column layout (e.g. a two-column table): read the right column fully, then the left one
+  if(crossing<=rows*0.1&&right.length>3&&left.length>3) return [...group(right),...group(left)];
+  return group(items);
+}
+function fixPdfArabic(s){return s.replace(/\s*\^\s*/g,"").replace(/األ/g,"الأ").replace(/اإل/g,"الإ").replace(/اآل/g,"الآ").replace(/أل(?=[\u0621-\u064A])/g,m=>m)}
+async function readFileLines(f){
+  const buf=await f.arrayBuffer(), name=f.name.toLowerCase();
+  if(name.endsWith(".pdf")||f.type==="application/pdf"){
+    const base="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/";
+    await loadScript(base+"pdf.min.js"); await loadScript(base+"pdf.worker.min.js");
+    pdfjsLib.GlobalWorkerOptions.workerSrc=base+"pdf.worker.min.js";
+    const pdf=await pdfjsLib.getDocument({data:buf,disableWorker:true}).promise; const lines=[];
+    for(let p=1;p<=pdf.numPages;p++){const tc=await (await pdf.getPage(p)).getTextContent();
+      lines.push(...pdfPageLines(tc.items));}
+    return lines.map(fixPdfArabic);
+  }
+  if(name.endsWith(".docx")){
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+    const zip=await JSZip.loadAsync(buf), xml=await zip.file("word/document.xml").async("string");
+    const doc=new DOMParser().parseFromString(xml,"application/xml"), W="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    return [...doc.getElementsByTagNameNS(W,"p")].map(p=>{let s="";p.querySelectorAll("*").forEach(n=>{if(n.localName==="t")s+=n.textContent;else if(n.localName==="tab")s+=" | ";else if(n.localName==="br")s+="\n"});return s}).flatMap(s=>s.split("\n")).map(s=>s.trim()).filter(Boolean);
+  }
+  throw new Error("unsupported");
+}
+function parseQA(lines){
+  lines=lines.map(l=>EN(l).replace(/\u200f|\u200e/g,"").trim()).filter(Boolean);
+  const text=lines.join("\n");
+  // 1) numbered markers  س1: ... ج1: ...
+  const re=/(?:^|[\s|])(س|سؤال|السؤال|ج|جواب|الجواب|الإجابة|الاجابة)\s*\(?(\d+)\)?\s*[:：\-–]/g;
+  const marks=[];let m;while((m=re.exec(text))){marks.push({kind:/^(س|سؤال|السؤال)$/.test(m[1])?"q":"a",n:+m[2],start:m.index,end:re.lastIndex})}
+  if(marks.filter(x=>x.kind==="q").length>=2){const Q={},A={};
+    marks.forEach((mk,i)=>{const seg=text.slice(mk.end,i+1<marks.length?marks[i+1].start:text.length).replace(/\s+/g," ").replace(/^\s*\|\s*|\s*\|\s*$/g,"").trim();(mk.kind==="q"?Q:A)[mk.n]=(((mk.kind==="q"?Q:A)[mk.n]||"")+" "+seg).trim()});
+    const out=Object.keys(Q).map(Number).sort((a,b)=>a-b).filter(n=>A[n]).map(n=>({q:Q[n],a:A[n]}));if(out.length)return out;}
+  // 2) unnumbered  س: ... / ج: ...
+  const out=[];let cur=null;
+  lines.forEach(l=>{let mm;
+    if((mm=l.match(/^(?:س|سؤال|السؤال)\s*[:：\-–]\s*(.+)/))){cur={q:mm[1],a:""};out.push(cur)}
+    else if((mm=l.match(/^(?:ج|جواب|الجواب|الإجابة|الاجابة)\s*[:：\-–]\s*(.+)/))&&cur&&!cur.a){cur.a=mm[1]}});
+  if(out.filter(x=>x.a).length>=2)return out.filter(x=>x.a);
+  // 3) separator  السؤال | الإجابة
+  const sep=lines.map(l=>l.split(/\s*\|\s*/).filter(Boolean)).filter(p=>p.length>=2).map(p=>({q:p[0].replace(/^\d+\s*[.\-)]\s*/,""),a:p.slice(1).join(" | ")}));
+  if(sep.length>=2)return sep;
+  // 4) a question ending with ؟ followed by an answer line
+  const qa=[];for(let i=0;i<lines.length-1;i++){if(/[؟?]\s*$/.test(lines[i])&&!/[؟?]\s*$/.test(lines[i+1])){qa.push({q:lines[i].replace(/^\d+\s*[.\-)]\s*/,""),a:lines[i+1].replace(/^(?:الإجابة|الجواب|ج)\s*[:：]\s*/,"")});i++}}
+  return qa;
+}
+
+/* ---------- misc ---------- */
+document.addEventListener("keydown",e=>{
+  if(!G||!$("#award")||$(".qcard.drawing")||/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  const k=e.key;
+  if(k===" "){e.preventDefault();G.revealed?(G.awarded&&next()):reveal()}
+  else if(/^[0-9٠-٩]$/.test(k)){const n=+EN(k);award(n===0?-1:n-1)}
+  else if(k==="ArrowLeft")next();
+});
+$("#homeBtn").onclick=async()=>{if($("#award")&&!(await confirmBox("الخروج من المسابقة الحالية؟")))return;G=null;home()};
+$("#fsBtn").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>toast("ملء الشاشة غير متاح هنا"))}catch(e){toast("ملء الشاشة غير متاح هنا")}};
+
+function confetti(){const c=$("#confetti"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const cols=["#c8962e","#0f5c5f","#1d5fbf","#d4651a","#f0c565","#1f8a4c"];
+  const ps=Array.from({length:180},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,r:4+Math.random()*6,c:cols[Math.random()*6|0],vy:2+Math.random()*3,vx:-1.5+Math.random()*3,a:Math.random()*6}));
+  let f=0;const my=++confRun;(function tick(){if(my!==confRun){x.clearRect(0,0,c.width,c.height);return}x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.a+=.1;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);x.restore()});
+    if(++f<260)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height)})()}
+
+home();
+</script>
+</body>
+</html>
